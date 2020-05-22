@@ -1,3 +1,4 @@
+# rubocop:disable Metrics/ClassLength
 require_relative 'error_found.rb'
 
 class ValidateFile < ErrorFound
@@ -87,6 +88,13 @@ class ValidateFile < ErrorFound
     @errors.open_tag[error_tag].concat(" (tag was open but not closed at line #{@open_tags_hash[tag][1]})")
   end
 
+  def create_error_tag_name(tag, index)
+    @error_number += 1
+    error_tag = @error_number.to_s + tag
+    @errors.open_tag[error_tag] = "Tag name invalid '#{tag}' on line #{index} tag must not start with numbers or spaces"
+  end
+
+  # rubocop:disable Metrics/PerceivedComplexity,Metrics/MethodLength,Metrics/CyclomaticComplexity
   def open_tags(line, index)
     ret_ar = next_open_index(line)
     start_tag = ret_ar[0]
@@ -96,7 +104,11 @@ class ValidateFile < ErrorFound
       cutted_line = ret_ar[1][start_tag..-1]
       finish_tag = cutted_line.index(/[ >\n]/)
       tag = cutted_line[1..finish_tag - 1]
-      if @open_tags_hash[tag] != [] || tag.size.zero?
+      if tag.size.zero? || !/\A\d+/.match(tag).nil?
+        tag = 'start with empty space' if tag.size.zero?
+        create_error_tag_name(tag, index)
+      end
+      if @open_tags_hash[tag] != []
         create_open_error(tag, index)
       else
         @index_open += 1
@@ -109,6 +121,7 @@ class ValidateFile < ErrorFound
       line = ret_ar[1]
     end
   end
+  # rubocop:enable Metrics/PerceivedComplexity,Metrics/MethodLength,Metrics/CyclomaticComplexity
 
   def next_close_index(line)
     ret_arr = []
@@ -180,6 +193,7 @@ class ValidateFile < ErrorFound
       cutted_line = ret_ar[1]
       finish_tag = cutted_line.index(/[ >\n]/)
       tag = cutted_line[1..finish_tag - 1]
+      tag = 'start with empty space' if tag.size.zero?
       check_close_errors(tag, index, last_open_tag)
       cutted_line = cutted_line[1..-1]
       line = cutted_line
@@ -208,3 +222,4 @@ class ValidateFile < ErrorFound
     @ident_line += 1
   end
 end
+# rubocop:enable Metrics/ClassLength
