@@ -3,23 +3,27 @@ require_relative "errorFound.rb"
 class ValidateFile < ErrorFound
   attr_reader :file_name, :errors
 
-  def initialize(file)
+  def initialize(file, space_ident)
     @file_name = file
+    @space_ident = space_ident
     @open_tags_hash = Hash.new([])
     @index_open = 0
     @closing_tags_hash = Hash.new([])
     @index_close = 0
+    @ident_line = 0
+    @spaces_id = 0
     @errors = ErrorFound.new
     @error_number = 0
   end
 
   def check_line(line)
     index = line.scan(/\d+/).pop
-    self.open_tags(line, index)
-    self.close_tags(line, index)
-    #    self.identation(line, index)
+    open_tags(line, index)
+    close_tags(line, index)
+    identation(line, index)
   end
 
+  # Check after looping for the file, if any open tag was not closed
   def check_unclosed_tags
     @open_tags_hash.each do |n|
       @error_number += 1
@@ -94,24 +98,25 @@ class ValidateFile < ErrorFound
     ret_arr
   end
 
+  # Search for the last tag opened withous closing
   def last_open_tag
     last_open = @open_tags_hash.max_by { |k, v| v[0] }
     last_open.first
   end
 
+  # Check if the tag is already open
   def tag_was_open?(key)
     @open_tags_hash.has_key?(key)
   end
 
+  # When closing tag, remove from the list of open tags
   def remove_open_tag(key)
     @open_tags_hash.delete(key) if @open_tags_hash[key]
   end
 
   def close_tags(line, index)
-    full_line = line
     ret_ar = next_close_index(line)
     start_tag = ret_ar[0]
-    line = ret_ar[1]
     return if start_tag == -1
 
     until start_tag == -1 || ret_ar[1].nil?
@@ -127,7 +132,7 @@ class ValidateFile < ErrorFound
       elsif last_open_tag != tag
         @error_number += 1
         error_tag = @error_number.to_s + tag
-        @errors.close_tag[error_tag] = "Tag must be properly nested, tried to close tag '#{tag}' on line #{index} with tag #{last_open_tag} still opened"
+        @errors.close_tag[error_tag] = "Tried to close tag '#{tag}' on line #{index} with tag '#{last_open_tag}' still opened"
         remove_open_tag(tag)
         @index_open -= 1
       else
@@ -143,7 +148,15 @@ class ValidateFile < ErrorFound
   end
 
   def identation(line, index)
+    actual_spaces = @spaces_id
+    @spaces_id = (@index_open - @index_close) * @space_ident
     start_tag = line.index(/\S/)
+    return if index == @ident_line
+
+    @ident_line += 1
     p "callou ident"
+    actual_spaces -= 2 if line.slice(start_tag, 2) == "</"
+
+    p "starter #{start_tag} line #{line} #acual#{actual_spaces}"
   end
 end

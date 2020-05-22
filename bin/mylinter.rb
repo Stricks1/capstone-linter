@@ -3,6 +3,8 @@
 require_relative "../lib/validateFile.rb"
 require "tmpdir"
 
+space_ident = 2
+
 # Get the files from directory that are .xml files
 string_all_files = `ls`
 all_files = []
@@ -20,7 +22,7 @@ tempfile = File.new(tempfilename, "w")
 files_validation = []
 #loop on xml files to make validations
 xml_files.each do |file|
-  new_file = ValidateFile.new(file)
+  new_file = ValidateFile.new(file, space_ident)
   file_lines = IO.readlines(file)
   file_lines.each_with_index do |line, i|
     line.gsub!("\n", " #{i + 1}\n")
