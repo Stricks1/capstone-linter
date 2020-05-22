@@ -1,7 +1,9 @@
 # rubocop:disable Metrics/ClassLength
 require_relative 'error_found.rb'
+require_relative 'validate_angle_brackets.rb'
 
 class ValidateFile
+  include ValidateAngleBrackets
   attr_reader :file_name, :errors, :error_number
 
   def initialize(file, space_ident)
@@ -9,7 +11,6 @@ class ValidateFile
     @space_ident = space_ident
     @open_tags_hash = Hash.new([])
     @index_open = 0
-    @closing_tags_hash = Hash.new([])
     @index_close = 0
     @ident_line = 1
     @spaces_id = 0
@@ -17,41 +18,16 @@ class ValidateFile
     @error_number = 0
   end
 
-  def check_angle_brackets(line, index)
-    bracket_stack = []
-    line.split('').each_with_index do |n, i|
-      if n == '<'
-        if bracket_stack.size.zero?
-          bracket_stack.push(n)
-        else
-          create_error_bracket_inside(index, i)
-          return nil
-        end
-      end
-      bracket_stack.pop if n == '>' && bracket_stack.size == 1
-    end
-    create_error_bracket_unclosed(index) unless bracket_stack.size.zero?
-  end
-
-  def create_error_bracket_inside(index, col)
-    @error_number += 1
-    @errors.angle_bracket.push("Line #{index} with angle bracket(<) open inside another angle bracket at col #{col}")
-  end
-
-  def create_error_bracket_unclosed(index)
-    @error_number += 1
-    @errors.angle_bracket.push("Line #{index} should have all angle brackets(<) closed")
-  end
-
+  # Call checks for open tags, close tags and identation for the param line
   def check_line(line)
     index = line.scan(/\d+/).pop
-    line = line.gsub(line.scan(/\d+/).pop, '')
+    line = line.gsub(line.scan(/ \d+/).pop, '')
     open_tags(line, index)
     close_tags(line, index)
     identation(line, index)
   end
 
-  # Check after looping for the file, if any open tag was not closed
+  # Check if anything still on the open tags stack
   def check_unclosed_tags
     @open_tags_hash.each do |n|
       @error_number += 1
@@ -59,6 +35,7 @@ class ValidateFile
     end
   end
 
+  # Search the line for next open tag returning position of tag and line shifting previous info
   def next_open_index(line)
     ret_arr = []
     ret_arr[0] = -1
@@ -81,6 +58,7 @@ class ValidateFile
     ret_arr
   end
 
+  # Create duplicate error on open tags error object
   def create_open_error(tag, index)
     @error_number += 1
     error_tag = @error_number.to_s + tag
@@ -88,13 +66,28 @@ class ValidateFile
     @errors.open_tag[error_tag].concat(" (tag was open but not closed at line #{@open_tags_hash[tag][1]})")
   end
 
+  # Create invalid tag name error on open tags error object
   def create_error_tag_name(tag, index)
     @error_number += 1
     error_tag = @error_number.to_s + tag
     @errors.open_tag[error_tag] = "Tag name invalid '#{tag}' on line #{index} tag must not start with numbers or spaces"
   end
 
-  # rubocop:disable Metrics/PerceivedComplexity,Metrics/MethodLength,Metrics/CyclomaticComplexity
+  # Given tag validate all possible errors for open tags
+  def check_open_errors(tag, index)
+    if tag.size.zero? || !/\A\d+/.match(tag).nil?
+      tag = 'start with empty space' if tag.size.zero?
+      create_error_tag_name(tag, index)
+    end
+    if @open_tags_hash[tag] != []
+      create_open_error(tag, index)
+    else
+      @index_open += 1
+      @open_tags_hash[tag] = [@index_open, index]
+    end
+  end
+
+  # Get all tags from the line to send for method that checks error
   def open_tags(line, index)
     ret_ar = next_open_index(line)
     start_tag = ret_ar[0]
@@ -104,16 +97,7 @@ class ValidateFile
       cutted_line = ret_ar[1][start_tag..-1]
       finish_tag = cutted_line.index(/[ >\n]/)
       tag = cutted_line[1..finish_tag - 1]
-      if tag.size.zero? || !/\A\d+/.match(tag).nil?
-        tag = 'start with empty space' if tag.size.zero?
-        create_error_tag_name(tag, index)
-      end
-      if @open_tags_hash[tag] != []
-        create_open_error(tag, index)
-      else
-        @index_open += 1
-        @open_tags_hash[tag] = [@index_open, index]
-      end
+      check_open_errors(tag, index)
       cutted_line = cutted_line[1..-1]
       line = cutted_line
       ret_ar = next_open_index(line)
@@ -121,8 +105,8 @@ class ValidateFile
       line = ret_ar[1]
     end
   end
-  # rubocop:enable Metrics/PerceivedComplexity,Metrics/MethodLength,Metrics/CyclomaticComplexity
 
+  # Search the line for next close tag returning position of tag and line shifting previous info
   def next_close_index(line)
     ret_arr = []
     ret_arr[0] = -1
@@ -140,10 +124,10 @@ class ValidateFile
     ret_arr
   end
 
-  # Search for the last tag opened withous closing
+  # Search for the last opened tag
   def last_open_tag
     last_open = @open_tags_hash.max_by { |_k, v| v[0] }
-    last_open.first
+    last_open.first unless last_open.nil?
   end
 
   # Check if the tag is already open
@@ -151,17 +135,19 @@ class ValidateFile
     @open_tags_hash.key?(key)
   end
 
-  # When closing tag, remove from the list of open tags
+  # Remove from the list of open tags
   def remove_open_tag(key)
     @open_tags_hash.delete(key) if @open_tags_hash[key]
   end
 
+  # Create error for close without open on close tags error object
   def create_close_error_not_opened(tag, index)
     @error_number += 1
     error_tag = @error_number.to_s + tag
     @errors.close_tag[error_tag] = "Tried to close tag '#{tag}' on line #{index} without opening"
   end
 
+  # Create error for close wrong tag on close tags error object
   def create_close_error_nasted(tag, index, last_open_tag)
     @error_number += 1
     error_tag = @error_number.to_s + tag
@@ -169,11 +155,11 @@ class ValidateFile
     @errors.close_tag[error_tag].concat("with tag '#{last_open_tag}' still opened")
   end
 
+  # Check for all possible errors on close tags
   def check_close_errors(tag, index, last_open_tag)
     if !tag_was_open?(tag)
       create_close_error_not_opened(tag, index)
       @index_close += 1
-      @closing_tags_hash[tag] = [@index_close, index]
     elsif last_open_tag != tag
       create_close_error_nasted(tag, index, last_open_tag)
       remove_open_tag(tag)
@@ -184,6 +170,7 @@ class ValidateFile
     end
   end
 
+  # Get all close tags from the line to send for method that checks error
   def close_tags(line, index)
     ret_ar = next_close_index(line)
     start_tag = ret_ar[0]
@@ -203,6 +190,7 @@ class ValidateFile
     end
   end
 
+  # Check identation spaces and create error if wrong identation found
   def identation(line, index)
     actual_spaces = @spaces_id
     @spaces_id = (@index_open - @index_close) * @space_ident
