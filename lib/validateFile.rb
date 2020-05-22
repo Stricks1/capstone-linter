@@ -1,7 +1,7 @@
 require_relative "errorFound.rb"
 
 class ValidateFile < ErrorFound
-  attr_reader :file_name, :errors
+  attr_reader :file_name, :errors, :error_number
 
   def initialize(file, space_ident)
     @file_name = file
@@ -10,7 +10,8 @@ class ValidateFile < ErrorFound
     @index_open = 0
     @closing_tags_hash = Hash.new([])
     @index_close = 0
-    @ident_line = 0
+    @ident_line = 1
+    @ident_err = 0
     @spaces_id = 0
     @errors = ErrorFound.new
     @error_number = 0
@@ -151,12 +152,14 @@ class ValidateFile < ErrorFound
     actual_spaces = @spaces_id
     @spaces_id = (@index_open - @index_close) * @space_ident
     start_tag = line.index(/\S/)
-    return if index == @ident_line
+    return if index.to_i != @ident_line
 
-    @ident_line += 1
-    p "callou ident"
     actual_spaces -= 2 if line.slice(start_tag, 2) == "</"
-
-    p "starter #{start_tag} line #{line} #acual#{actual_spaces}"
+    unless start_tag == actual_spaces
+      @error_number += 1
+      @errors.ident[@ident_err] = "Identation error on line #{@ident_line} should have #{actual_spaces} spaces"
+      @ident_err += 1
+    end
+    @ident_line += 1
   end
 end

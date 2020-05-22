@@ -47,8 +47,12 @@ files_validation.each do |check_file|
   check_file.errors.close_tag.each do |v, i|
     puts i
   end
+  check_file.errors.ident.each do |v, i|
+    puts v
+  end
+  puts "============================================="
+  puts "TOTAL ERRORS FOUND #{check_file.error_number}"
+  puts "============================================="
 end
 
 File.delete(tempfilename)
-
-p xml_files
