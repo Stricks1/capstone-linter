@@ -13,15 +13,18 @@ all_files.each do |file|
   xml_files << file if file.slice(-4..-1) == '.xml'
 end
 
-tempfilename = File.join(Dir.tmpdir, 'temporary')
-tempfile = File.new(tempfilename, 'w')
+
 
 files_validation = []
 # loop on xml files to make validations
 xml_files.each do |file|
+  tempfilename = File.join(Dir.tmpdir, 'temporary')
+  tempfile = File.new(tempfilename, 'w')
+  
   new_file = ValidateFile.new(file, space_ident)
   file_lines = IO.readlines(file)
   file_lines.each_with_index do |line, i|
+    new_file.check_angle_brackets(line, i+1)
     line.gsub!("\n", " #{i + 1}\n")
     line.gsub!('>', "> #{i + 1}\n")
     tempfile.syswrite(line)
@@ -32,9 +35,12 @@ xml_files.each do |file|
     new_file.check_line(line)
   end
   files_validation << new_file
+
+  tempfile.close
+  File.delete(tempfilename)
 end
 
-tempfile.close
+
 
 files_validation.each do |check_file|
   check_file.check_unclosed_tags
@@ -47,9 +53,10 @@ files_validation.each do |check_file|
   check_file.errors.ident.each do |v|
     puts v
   end
+  check_file.errors.angle_bracket.each do |v|
+    puts v
+  end
   puts '============================================='
-  puts "TOTAL ERRORS FOUND #{check_file.error_number}"
+  puts "TOTAL ERRORS FOUND #{check_file.error_number} AT FILE #{check_file.file_name}" 
   puts '============================================='
 end
-
-File.delete(tempfilename)
