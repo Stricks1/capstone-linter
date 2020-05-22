@@ -11,7 +11,6 @@ class ValidateFile < ErrorFound
     @closing_tags_hash = Hash.new([])
     @index_close = 0
     @ident_line = 1
-    @ident_err = 0
     @spaces_id = 0
     @errors = ErrorFound.new
     @error_number = 0
@@ -198,14 +197,12 @@ class ValidateFile < ErrorFound
 
     if line.strip == ''
       @error_number += 1
-      @errors.ident[@ident_err] = "Blank line detected on line #{@ident_line}"
-      @ident_err += 1
+      @errors.ident.push("Blank line detected on line #{@ident_line}")
     else
       actual_spaces -= 2 if line.slice(start_tag, 2) == '</'
       unless start_tag == actual_spaces
         @error_number += 1
-        @errors.ident[@ident_err] = "Identation error on line #{@ident_line} should have #{actual_spaces} spaces"
-        @ident_err += 1
+        @errors.ident.push("Identation error on line #{@ident_line} should have #{actual_spaces} spaces")
       end
     end
     @ident_line += 1
