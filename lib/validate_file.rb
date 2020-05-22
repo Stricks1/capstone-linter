@@ -1,7 +1,7 @@
 # rubocop:disable Metrics/ClassLength
 require_relative 'error_found.rb'
 
-class ValidateFile < ErrorFound
+class ValidateFile
   attr_reader :file_name, :errors, :error_number
 
   def initialize(file, space_ident)
