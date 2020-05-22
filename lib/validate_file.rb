@@ -127,7 +127,7 @@ class ValidateFile
   # Search for the last opened tag
   def last_open_tag
     last_open = @open_tags_hash.max_by { |_k, v| v[0] }
-    last_open.first unless last_open.nil?
+    last_open&.first
   end
 
   # Check if the tag is already open
@@ -148,7 +148,7 @@ class ValidateFile
   end
 
   # Create error for close wrong tag on close tags error object
-  def create_close_error_nasted(tag, index, last_open_tag)
+  def create_close_error_nasted(tag, index)
     @error_number += 1
     error_tag = @error_number.to_s + tag
     @errors.close_tag[error_tag] = "Tried to close tag '#{tag}' on line #{index} "
@@ -156,12 +156,12 @@ class ValidateFile
   end
 
   # Check for all possible errors on close tags
-  def check_close_errors(tag, index, last_open_tag)
+  def check_close_errors(tag, index)
     if !tag_was_open?(tag)
       create_close_error_not_opened(tag, index)
       @index_close += 1
     elsif last_open_tag != tag
-      create_close_error_nasted(tag, index, last_open_tag)
+      create_close_error_nasted(tag, index)
       remove_open_tag(tag)
       @index_open -= 1
     else
@@ -181,7 +181,7 @@ class ValidateFile
       finish_tag = cutted_line.index(/[ >\n]/)
       tag = cutted_line[1..finish_tag - 1]
       tag = 'start with empty space' if tag.size.zero?
-      check_close_errors(tag, index, last_open_tag)
+      check_close_errors(tag, index)
       cutted_line = cutted_line[1..-1]
       line = cutted_line
       ret_ar = next_close_index(line)
