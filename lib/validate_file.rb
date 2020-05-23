@@ -19,16 +19,6 @@ class ValidateFile
     @error_number = 0
   end
 
-  # Call checks for open tags, close tags and identation for the param line
-  def check_line(line)
-    index = line.scan(/\d+/).pop
-    line = line.gsub(line.scan(/ \d+/).pop, '')
-    open_tags(line, index)
-    close_tags(line, index)
-    identation(line, index)
-  end
-
-  # Check if anything still on the open tags stack
   def check_unclosed_tags
     @open_tags_hash.each do |n|
       @error_number += 1
@@ -36,7 +26,6 @@ class ValidateFile
     end
   end
 
-  # Search the line for next open tag returning position of tag and line shifting previous info
   def next_open_index(line)
     ret_arr = []
     ret_arr[0] = -1
@@ -59,7 +48,6 @@ class ValidateFile
     ret_arr
   end
 
-  # Create duplicate error on open tags error object
   def create_open_error(tag, index)
     @error_number += 1
     error_tag = @error_number.to_s + tag
@@ -67,14 +55,12 @@ class ValidateFile
     @errors.open_tag[error_tag].concat(" (tag was open but not closed at line #{@open_tags_hash[tag][1]})")
   end
 
-  # Create invalid tag name error on open tags error object
   def create_error_tag_name(tag, index)
     @error_number += 1
     error_tag = @error_number.to_s + tag
     @errors.open_tag[error_tag] = "Tag name invalid '#{tag}' on line #{index} tag must not start with numbers or spaces"
   end
 
-  # Given tag validate all possible errors for open tags
   def check_open_errors(tag, index)
     if tag.size.zero? || !/\A\d+/.match(tag).nil?
       tag = 'start with empty space' if tag.size.zero?
@@ -88,7 +74,6 @@ class ValidateFile
     end
   end
 
-  # Get all tags from the line to send for method that checks error
   def open_tags(line, index)
     ret_ar = next_open_index(line)
     start_tag = ret_ar[0]
@@ -107,7 +92,6 @@ class ValidateFile
     end
   end
 
-  # Search the line for next close tag returning position of tag and line shifting previous info
   def next_close_index(line)
     ret_arr = []
     ret_arr[0] = -1
@@ -125,30 +109,25 @@ class ValidateFile
     ret_arr
   end
 
-  # Search for the last opened tag
   def last_open_tag
     last_open = @open_tags_hash.max_by { |_k, v| v[0] }
     last_open&.first
   end
 
-  # Check if the tag is already open
   def tag_was_open?(key)
     @open_tags_hash.key?(key)
   end
 
-  # Remove from the list of open tags
   def remove_open_tag(key)
     @open_tags_hash.delete(key) if @open_tags_hash[key]
   end
 
-  # Create error for close without open on close tags error object
   def create_close_error_not_opened(tag, index)
     @error_number += 1
     error_tag = @error_number.to_s + tag
     @errors.close_tag[error_tag] = "Tried to close tag '#{tag}' on line #{index} without opening"
   end
 
-  # Create error for close wrong tag on close tags error object
   def create_close_error_nasted(tag, index)
     @error_number += 1
     error_tag = @error_number.to_s + tag
@@ -156,7 +135,6 @@ class ValidateFile
     @errors.close_tag[error_tag].concat("with tag '#{last_open_tag}' still opened")
   end
 
-  # Check for all possible errors on close tags
   def check_close_errors(tag, index)
     if !tag_was_open?(tag)
       create_close_error_not_opened(tag, index)
@@ -171,7 +149,6 @@ class ValidateFile
     end
   end
 
-  # Get all close tags from the line to send for method that checks error
   def close_tags(line, index)
     ret_ar = next_close_index(line)
     start_tag = ret_ar[0]
@@ -191,7 +168,6 @@ class ValidateFile
     end
   end
 
-  # Check identation spaces and create error if wrong identation found
   def identation(line, index)
     actual_spaces = @spaces_id
     @spaces_id = (@index_open - @index_close) * @space_ident
@@ -209,6 +185,14 @@ class ValidateFile
       end
     end
     @ident_line += 1
+  end
+
+  def check_line(line)
+    index = line.scan(/\d+/).pop
+    line = line.gsub(line.scan(/ \d+/).pop, '')
+    open_tags(line, index)
+    close_tags(line, index)
+    identation(line, index)
   end
 end
 # rubocop:enable Metrics/ClassLength
