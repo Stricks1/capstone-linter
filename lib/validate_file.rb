@@ -5,6 +5,7 @@ require_relative 'validate_angle_brackets.rb'
 class ValidateFile
   include ValidateAngleBrackets
   attr_reader :file_name, :errors, :error_number
+  attr_accessor :open_tags_hash
 
   def initialize(file, space_ident)
     @file_name = file
