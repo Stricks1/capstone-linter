@@ -119,7 +119,7 @@ or
 > Bad code:
 
 ```
-< Test> 
+<Test> 
   <Info>
     <Name>Gabriel</Name>
 </Test> 
@@ -128,7 +128,7 @@ or
 > Good code:
 
 ```
-< Test> 
+<Test> 
   <Info>
     <Name>Gabriel</Name>
   </Info>
