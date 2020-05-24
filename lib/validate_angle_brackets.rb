@@ -22,6 +22,6 @@ module ValidateAngleBrackets
 
   def create_error_bracket_unclosed(index)
     @error_number += 1
-    @errors.angle_bracket.push("Line #{index} should have all angle brackets(<) closed")
+    @errors.angle_bracket.push("Line #{index} should have all angle brackets(<) closed with a matchin (>)")
   end
 end
