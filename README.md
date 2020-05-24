@@ -2,14 +2,14 @@
 
 ## Table of Contents
 
-[Description](#Description) 
-[Rules](#Rules) 
-[Instructions](#Instructions) 
-[Built With](#Built-With)
-[RSPec Tests](#RSPec-Tests)
-[Authors](#Authors)
-[Show your support](#Show-your-support)
-[Acknowledgments](#Acknowledgments)
+- [Description](#Description) 
+- [Rules](#Rules) 
+- [Instructions](#Instructions) 
+- [Built With](#Built-With)
+- [RSPec Tests](#RSPec-Tests)
+- [Authors](#Authors)
+- [Show your support](#Show-your-support)
+- [Acknowledgments](#Acknowledgments)
 
 
 ## Description
