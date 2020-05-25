@@ -1,7 +1,7 @@
 # rubocop:disable Layout/LineLength
-require_relative './lib/validate_file.rb'
-require_relative './lib/validate_angle_brackets.rb'
-require_relative './lib/error_found.rb'
+require_relative '../lib/validate_file.rb'
+require_relative '../lib/validate_angle_brackets.rb'
+require_relative '../lib/error_found.rb'
 
 describe ValidateAngleBrackets do
   let(:val_file_obj) { ValidateFile.new('text.xml', 2) }

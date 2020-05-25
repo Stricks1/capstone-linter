@@ -77,9 +77,9 @@ class ValidateFile
     if @open_tags_hash[tag] != []
       create_open_error(tag, index)
     else
+      see_root_elem(tag)
       @index_open += 1
       @open_tags_hash[tag] = [@index_open, index]
-      see_root_elem(tag)
     end
   end
 

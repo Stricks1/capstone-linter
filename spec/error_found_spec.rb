@@ -1,4 +1,4 @@
-require_relative './lib/error_found.rb'
+require_relative '../lib/error_found.rb'
 
 describe ErrorFound do
   let(:test_hash) { { 'one' => 'Message 1', 'two' => 'Message 2', 'three' => 'Message 3' } }
