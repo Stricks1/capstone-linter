@@ -24,6 +24,7 @@ In this project, the objective was to create a linter for beginners it provides 
  - Tags closed that aren't open;
  - Empty lines;
  - Indentation (On newline, for every open tag it need more 'x' spaces to start writing).
+ - Root element (XML file should have a Tag element that encompasses all other tags)
 
 After running some tests I realized that the Balance of angle brackets would lead to errors everywhere, so to make it more user friendly I separated the linter on 2 phases. First it checks the Balance and show those errors for the file. It just checks the other issues if passes on the Balance validation. It messages the user about fixing those errors and run again to check the whole file. I decided to make this linter to test my skills and I'm aware there is room to improvements, would like make more validations to make it more useful in the future.
 
@@ -212,6 +213,33 @@ or
   <Name>Gabriel</Name>
 </Person>
 ```
+
+**_XML file should have root element_**
+
+> Bad code:
+
+```
+<Person>
+  <Name>Gabriel</Name>
+</Person>
+<Person>
+  <Name>Jonh</Name>
+</Person>
+```
+
+> Good code:
+
+```
+<Persons>
+  <Person>
+    <Name>Gabriel</Name>
+  </Person>
+  <Person>
+    <Name>Jonh</Name>
+  </Person>
+</Persons>
+```
+
 
 ## Instructions
 
