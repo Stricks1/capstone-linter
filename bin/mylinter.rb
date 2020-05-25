@@ -15,8 +15,8 @@ end
 
 files_validation = []
 xml_files.each do |file|
-  # tempfilename = File.join(Dir.tmpdir, 'temporary')
-  tempfile = File.new('/home/gabriel/Project/example', 'w')
+  tempfilename = File.join(Dir.tmpdir, 'temporary')
+  tempfile = File.new(tempfilename, 'w')
   new_file = ValidateFile.new(file, space_ident)
   file_lines = IO.readlines(file)
   file_lines.each_with_index do |line, i|
@@ -33,7 +33,7 @@ xml_files.each do |file|
   end
   files_validation << new_file
   tempfile.close
- # File.delete(tempfilename)
+  File.delete(tempfilename)
 end
 
 files_validation.each do |check_file|
