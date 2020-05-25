@@ -17,6 +17,10 @@ class ValidateFile
     @spaces_id = 0
     @errors = ErrorFound.new
     @error_number = 0
+    @root_element = ''
+    @closed_root = false
+    @tried_close_more_roots = false
+    @last_close_key = ''
   end
 
   def check_unclosed_tags
@@ -24,6 +28,10 @@ class ValidateFile
       @error_number += 1
       @errors.open_tag[n.first] = "Unclosed tag '#{n.first}' on line #{@open_tags_hash[n.first][1]}"
     end
+    return unless @tried_close_more_roots || @last_close_key != @root_element
+
+    @error_number += 1
+    @errors.open_tag[:root_element] = 'XML file without root element that encompasses all XML'
   end
 
   def next_open_index(line)
@@ -71,7 +79,14 @@ class ValidateFile
     else
       @index_open += 1
       @open_tags_hash[tag] = [@index_open, index]
+      see_root_elem(tag)
     end
+  end
+
+  def see_root_elem(tag)
+    return unless @root_element == '' && @index_open == 1
+
+    @root_element = tag
   end
 
   def open_tags(line, index)
@@ -119,6 +134,14 @@ class ValidateFile
   end
 
   def remove_open_tag(key)
+    if key == @root_element
+      if @closed_root
+        @tried_close_more_roots = true
+      else
+        @closed_root = true
+      end
+    end
+    @last_close_key = key
     @open_tags_hash.delete(key) if @open_tags_hash[key]
   end
 
