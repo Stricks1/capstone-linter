@@ -17,12 +17,21 @@ class ValidateFile
     @spaces_id = 0
     @errors = ErrorFound.new
     @error_number = 0
+    @root_element = ''
+    @closed_root = false
+    @tried_close_more_roots = false
   end
 
   def check_unclosed_tags
+    any_unclosed = false
     @open_tags_hash.each do |n|
+      any_unclosed = true
       @error_number += 1
       @errors.open_tag[n.first] = "Unclosed tag '#{n.first}' on line #{@open_tags_hash[n.first][1]}"
+    end
+    if any_unclosed || @tried_close_more_roots
+      @error_number += 1
+      @errors.open_tag[:root_element] = "XML file without root element that encompasses all XML"   
     end
   end
 
@@ -71,6 +80,13 @@ class ValidateFile
     else
       @index_open += 1
       @open_tags_hash[tag] = [@index_open, index]
+      see_root_elem(tag)
+    end
+  end
+
+  def see_root_elem(tag)
+    if @root_element == '' && @index_open == 1
+      @root_element = tag
     end
   end
 
@@ -119,6 +135,13 @@ class ValidateFile
   end
 
   def remove_open_tag(key)
+    if key == @root_element
+      if @closed_root
+        tried_close_more_roots = true
+      else
+        @closed_root = true
+      end
+    end
     @open_tags_hash.delete(key) if @open_tags_hash[key]
   end
 
@@ -172,6 +195,7 @@ class ValidateFile
     actual_spaces = @spaces_id
     @spaces_id = (@index_open - @index_close) * @space_ident
     start_tag = line.index(/\S/)
+    @spaces_id = 0 if @spaces_id < 0 
     return if index.to_i != @ident_line
 
     if line.strip == ''
@@ -179,6 +203,7 @@ class ValidateFile
       @errors.ident.push("Blank line detected on line #{@ident_line}")
     else
       actual_spaces -= 2 if line.slice(start_tag, 2) == '</'
+      actual_spaces = 0 if actual_spaces < 0 
       unless start_tag == actual_spaces
         @error_number += 1
         @errors.ident.push("Identation error on line #{@ident_line} should have #{actual_spaces} spaces")
