@@ -18,15 +18,18 @@ In this project, the objective was to create a linter for beginners it provides 
  
  - Balance of angle brackets (If every open angle bracket has a closing pair);
  - Tags that are opened inside itself;
- - Tag names validity (Tag name can't start with a space or a number);
+ - Tag names validity (Tag name can't start with space or a number);
  - Tags not closed;
  - Tag close unmatching the last open tag;
  - Tags closed that aren't open;
  - Empty lines;
- - Indentation (On newline, for every open tag it need more 'x' spaces to start writing).
+ - Indentation (On newline, for every open tag it needs more 'x' spaces to start writing).
  - Root element (XML file should have a Tag element that encompasses all other tags)
 
-After running some tests I realized that the Balance of angle brackets would lead to errors everywhere, so to make it more user friendly I separated the linter on 2 phases. First it checks the Balance and show those errors for the file. It just checks the other issues if passes on the Balance validation. It messages the user about fixing those errors and run again to check the whole file. I decided to make this linter to test my skills and I'm aware there is room to improvements, would like make more validations to make it more useful in the future.
+After running some tests I realized that the Balance of angle brackets would lead to errors everywhere, so to make it more user friendly I separated the linter on 2 phases. First, it checks the Balance and shows those errors for the file. It just checks the other issues if passes on the Balance validation. It messages the user about fixing those errors and runs again to check the whole file. I decided to make this linter to test my skills and I'm aware there is room for improvements, would like to make more validations to make it more useful in the future. On a future feature will be good to include validation for: 
+- atributes values;
+- XML declaration;
+- auto-correct for the indentation;
 
 ![screenshoot](./img/running.png)
 
@@ -39,7 +42,7 @@ To do it you can open the file mylinter.rb (located inside the /bin folder of wh
 
 **_Unbalanced Angle Brackets at line_**
 
-When the line of the file has open angle brackets without closing
+When the line of the file has open-angle brackets without closing
 
 > Bad code:
 
@@ -251,7 +254,7 @@ To install it you can get a local copy of the repository please run the followin
 \$ git clone https://github.com/Stricks1/capstone-linter.git
 ```
 
-After cloning, to be able to run it on any folder to check your .xml files you need to install it as a Bash program. Everytime we call a Bash program, e.g., ls, chmod, mv, etc., Bash searches through a predefined list of folders looking for those programs. This is called the path. To see what the path is set to on your computer, try:
+After cloning, to be able to run it on any folder to check your .xml files you need to install it as a Bash program. Every time we call a Bash program, e.g., ls, chmod, mv, etc., Bash searches through a predefined list of folders looking for those programs. This is called the path. To see what the path is set to on your computer, try:
 
 ```
 \$ echo $PATH
@@ -263,13 +266,13 @@ The output should be a long string of various system-critical folders. We need t
 \$ mkdir -p /usr/local/bin/
 ```
 
-Now, we can create a softlink (or an alias in OS X terms) within the /usr/local/bin/ folder. To create an alias, we'll use the ln command. Go into the directory you cloned the repo, and go to the bin folder where the mylinter.rb lives, on that folder, type:
+Now, we can create a soft link (or an alias in OS X terms) within the /usr/local/bin/ folder. To create an alias, we'll use the ln command. Go into the directory you cloned the repo, and go to the bin folder where the mylinter.rb lives, on that folder, type:
 
 ```
 \$ ln -s $PWD/mylinter.rb /usr/local/bin/
 ```
 
-Obs.: Maybe you will need permission to make sure you can create that softlink, if that is needed just add sudo before the command:
+Obs.: Maybe you will need permission to make sure you can create that soft link, if that is needed just add sudo before the command:
 
 ```
 \$ sudo ln -s $PWD/mylinter.rb /usr/local/bin/
@@ -281,7 +284,7 @@ Now the installation is complete and it will run like usual linters. You should 
 \$ mylinter.rb
 ```
 
-The linter will check throught all files of the folder you are in, get the .xml files from there, do the validations and display the errors you need to fix for each file! 
+The linter will check through all files of the folder you are in, get the .xml files from there, do the validations, and display the errors you need to fix for each file! 
 
 
 ## Built-With
@@ -292,7 +295,7 @@ The linter will check throught all files of the folder you are in, get the .xml 
 
 ## RSPec-Tests
 
-This code was tested with RSpec. If you want to run the tests you should have the rspec gem installed. If you dont have it you can install the gem for it running the following code on your terminal
+This code was tested with RSpec. If you want to run the tests you should have the rspec gem installed. If you don't have it you can install the gem for it running the following code on your terminal
 
 ```
 \$ gem install rspec
@@ -308,6 +311,8 @@ To run the tests you just go to the root folder where you installed the linter p
 ## Authors
 
 👤 **Author**
+
+Gabriel Malheiros Silveira
 
 - Github: [@Stricks1](https://github.com/Stricks1)
 - E-mail: [Gabriel Silveira](mailto:gmalheiross@gmail.com)
