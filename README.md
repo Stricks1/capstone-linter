@@ -286,6 +286,9 @@ Now the installation is complete and it will run like usual linters. You should 
 
 The linter will check through all files of the folder you are in, get the .xml files from there, do the validations, and display the errors you need to fix for each file! 
 
+## Video Presentation
+
+[Project Presentation](https://www.loom.com/share/d0067726e84b4fb6a588abc97a56bc1f)
 
 ## Built-With
 
