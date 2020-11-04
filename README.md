@@ -26,7 +26,7 @@ In this project, the objective was to create a linter for beginners it provides 
  - Indentation (On newline, for every open tag it needs more 'x' spaces to start writing).
  - Root element (XML file should have a Tag element that encompasses all other tags)
 
-After running some tests I realized that the Balance of angle brackets would lead to errors everywhere, so to make it more user friendly I separated the linter on 2 phases. First, it checks the Balance and shows those errors for the file. It just checks the other issues if passes on the Balance validation. It messages the user about fixing those errors and runs again to check the whole file. I decided to make this linter to test my skills and I'm aware there is room for improvements, would like to make more validations to make it more useful in the future. On a future feature will be good to include validation for: 
+After running some tests I realized that the Balance of angle brackets would lead to errors everywhere, so to make it more user friendly I separated the linter on 2 phases. First, it checks the Balance and shows those errors for the file. It just checks the other issues if passes on the Balance validation. It messages the user about fixing those errors and runs again to check the whole file. I decided to make this linter to test my skills and I'm aware there is room for improvements, would like to make more validations in the future. On a future feature will be good to include validation for: 
 - atributes values;
 - XML declaration;
 - auto-correct for the indentation;
